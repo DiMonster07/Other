@@ -8,10 +8,9 @@ def myreverse (a):
     res.reverse()
     return "".join(res)
  
-HOST = "10.254.254.100"
-PORT = 10000
-BUFF_S = 4
-
+HOST = "10.51.16.109"
+PORT = 10001
+BUFF_S = 10
 conn = socket.socket()
 conn.connect((HOST, PORT))
 data = (conn.recv(BUFF_S + 1).decode())

@@ -1,6 +1,6 @@
 from datetime import datetime
 from mydatatime import *
-import unittest
+import unittest, time
 
 
 class Test_Init(unittest.TestCase):
@@ -19,56 +19,48 @@ class Test_is_leap(unittest.TestCase):
 	def test_1(self):
 		self.assertEqual(True, is_leap(2012))
 	def test_2(self):
-		self.assertEqual(True, is_leap(2013)) 
+		self.assertEqual(False, is_leap(2013))
 
 
 class Test_days_in_month(unittest.TestCase):
 	def test_1(self):
 		self.assertEqual(29, days_in_month(2012, 2))
 	def test_2(self):
-		self.assertEqual(29, days_in_month(2013, 2))
-
-class Test_cmp(unittest.TestCase):
-	def test_1(self):
-		self.assertEqual(1, _cmp(3, 2))
-	def test_2(self):
-		self.assertEqual(-1, _cmp(1, 2))
-	def test_3(self):
-		self.assertEqual(0, _cmp(2, 2))
+		self.assertEqual(28, days_in_month(2013, 2))
 
 class Test_check_int_field(unittest.TestCase):
 	def test_1(self):
 		self.assertEqual(4, check_int_field(4))
 	def test_2(self):
-		self.assertEqual(TypeError, check_int_field(4.455))
+		self.assertRaises(TypeError, check_int_field, 4.455)
 
 class Test_check_data_fields(unittest.TestCase):
 	def test_1(self):
 		self.assertEqual((4, 4, 4), check_data_fields(4, 4, 4))
 	def test_2(self):
-		self.assertEqual(ValueError, check_data_fields(99999, 4, 4))
+		self.assertRaises(ValueError, check_data_fields, 99999, 4, 4)
 	def test_3(self):
-		self.assertEqual(ValueError, check_data_fields("99999", 4, 4))
+		self.assertRaises(TypeError, check_data_fields, "99999", 4, 4)
 	def test_4(self):
-		self.assertEqual(ValueError, check_data_fields(99999, 15, 60))
+		self.assertRaises(ValueError, check_data_fields, 99999, 15, 60)
 	def test_5(self):
-		self.assertEqual(ValueError, check_data_fields(34, 30, 4))
+		self.assertRaises(ValueError, check_data_fields, 34, 30, 4)
 	def test_6(self):
-		self.assertEqual(ValueError, check_data_fields(34, 4, 80))
+		self.assertRaises(ValueError, check_data_fields, 34, 4, 80)
 
 class Test_check_time_fields(unittest.TestCase):
 	def test_1(self):
 		self.assertEqual((12, 10, 4, 56748), check_time_fields(12, 10, 4, 56748))
 	def test_2(self):
-		self.assertEqual(ValueError, check_time_fields(26, 10, 4, 56748))
+		self.assertRaises(ValueError, check_time_fields, 26, 10, 4, 56748)
 	def test_3(self):
-		self.assertEqual(ValueError, check_time_fields("99999", 462, 3241, 999999999))
+		self.assertRaises(TypeError, check_time_fields, "99999", 462, 3241, 999999999)
 	def test_4(self):
-		self.assertEqual(ValueError, check_time_fields(12, 462, 3241, 999999999))
+		self.assertRaises(ValueError, check_time_fields, 12, 462, 3241, 999999999)
 	def test_5(self):
-		self.assertEqual(ValueError, check_time_fields(12, 10, 3241, 999999999))
+		self.assertRaises(ValueError, check_time_fields, 12, 10, 3241, 999999999)
 	def test_6(self):
-		self.assertEqual(ValueError, check_time_fields(12, 10, 5, 999999999))
+		self.assertRaises(ValueError, check_time_fields, 12, 10, 5, 999999999)
 
 class Test_replace(unittest.TestCase):
 	def setUp(self):
@@ -77,7 +69,7 @@ class Test_replace(unittest.TestCase):
 	def test_1(self):
 		self.assertEqual(self.a, self.b.replace())
 	def test_2(self):
-		self.assertEqual(self.a.replace(day = 5), self.b.replace(day = 5))
+ 		self.assertEqual(self.a.replace(day = 5), self.b.replace(day = 5))
 
 class Test_cmp_classmethod(unittest.TestCase):
 	def setUp(self):
@@ -88,7 +80,7 @@ class Test_cmp_classmethod(unittest.TestCase):
 	def test_2(self):
 		self.assertEqual(0, self.a._cmp(self.b.replace(2015, 5, 2, 12, 30, 35, 300)))
 	def test_3(self):
-		self.assertEqual(0, self.a._cmp(self.b.replace(2013, 4, 2, 12, 30, 35, 300)))
+		self.assertEqual(1, self.a._cmp(self.b.replace(2013, 4, 2, 12, 30, 35, 300)))
 
 class Test_second_in_month(unittest.TestCase):
 	def setUp(self):
@@ -130,11 +122,29 @@ class test_isofromstr(unittest.TestCase):
 	def test_1(self):
 		self.assertEqual(self.a, isofromstr("2012-02-02 12:30:35:000300"))
 	def test_2(self):
-		self.assertEqual(self.a, isofromstr("2012-02-02 12:30:35:000333"))
+		self.assertEqual(self.a.replace(2012, 2, 2, 12, 30, 35, 333), isofromstr("2012-02-02 12:30:35:000333"))
 	def test_3(self):
-		self.assertEqual(self.a, isofromstr("2012-20-02 12:30:35:000300"))
-	
+		self.assertEqual(None, isofromstr("2012-20-02 12:30:35:000300"))
 
+class test_day_name(unittest.TestCase):
+	def setUp(self):
+		self.a = mydatatime(2015, 12, 23, 12, 30, 35, 300)
+		self.b = datetime(2010, 12, 23)
+	def test_1(self):
+		self.assertEqual("Wednesday", self.a.day_name())
+	def test_2(self):
+		self.assertEqual(DAY_NAME[self.b.weekday()], self.a.replace(2010).day_name())
+	def test_3(self):
+		self.assertEqual(DAY_NAME[self.b.weekday()], self.a.replace(2200, 10, 20).day_name())
 
+class test_as_posixtime(unittest.TestCase):
+	def setUp(self):
+		self.a = mydatatime(2004, 9, 16, 00, 00, 00, 00000)
+		self.b = datetime(2004, 9, 16)
+	def test_1(self):
+		self.assertEqual(1095292800, self.a.as_posixtime())
+	def test_2(self):
+		self.assertEqual(386380800, self.a.replace(1957, 10, 04, 00, 00, 00).as_posixtime())
+		
 if __name__ == '__main__':
     unittest.main()

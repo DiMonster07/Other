@@ -4,6 +4,7 @@ import re, unittest
 MINYEAR = 1
 MAXYEAR = 9999
 DAYS_IN_MONTH = [-1, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+DAY_NAME = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 def print_time (foo):
     def wrapper(*args, **kwargs): 
@@ -106,6 +107,34 @@ class mydatatime():
 		y, ts, m = self._year, int(self.total_seconds()), (self._microsecond) % 10**6
 		y2, ts2, m2 = other._year, int(other.total_seconds()), (other._microsecond) % 10**6
 		return _cmp((y, ts, m), (y2, ts2, m2))
+
+	@print_time
+	def day_name(self):
+		y = abs(self._year)
+		d = 0
+		for x in range(1, y):
+			d += 366 if is_leap(x) else 365
+		d += sum(DAYS_IN_MONTH[1: self._month]) + 1 if is_leap(self._year) else int(sum(DAYS_IN_MONTH[1: self._month]))
+		return str(DAY_NAME[(d + 1) % 7])
+
+	@print_time
+	def as_posixtime(self):
+		s = 0
+		if self._year >= 1970:
+			for x in range(1970, self._year):
+				s += 365
+				if is_leap(x):
+					s += 1
+			s += self.seconds_in_months() / 86400 + self._day - 1
+		else:
+			for x in range(self._year, 1970):
+				s += 365
+				if is_leap(x):
+					s += 1
+			s -= self.seconds_in_months() / 86400 + self._day - 1
+		s = s * 86400
+		print "POSIX seconds: " + str(s)
+		return s
 
 	@print_time
 	def seconds_in_months(self):

@@ -3,22 +3,22 @@ from io import SEEK_SET
 from subprocess import Popen, PIPE
 from numbers import Integral
  
-HOST = "10.254.254.100"
-PORT = 10000
-BUFF_S = 4
+HOST = "10.51.16.78"
+PORT = 10007
+BUFF_S = 5
 fw = -1
 offset = 0
  
 list_keys = []
 list_values = []
  
-def write_in_place (pc, text, outfile, num):
-    offset_ = (pc - 1 - (num - fw))*BUFF_S
-    print("Offset: " + str(off))
+def write_in_place (partscount, text, outfile, num):
+    offset_ = (partscount - num - 1)*BUFF_S
+    print("Offset: " + str(offset_))
     print(text)
     if offset_ != 0:
-        off -= offset
-        outfile.seek(off, SEEK_SET)
+        offset_ -= offset
+        outfile.seek(offset_, SEEK_SET)
         outfile.write(text)
     else:
         outfile.seek(0, SEEK_SET)
